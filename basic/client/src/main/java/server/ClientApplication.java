@@ -59,8 +59,8 @@ class Availability {
 class AvailabilityClient {
 
     private final WebClient webClient;
-    private @Value("${console_server_port:8083}") Integer port;
-    private @Value("${console_server_hostname:localhost}") String hostname;
+    private @Value("${console.server.port:8083}") Integer port;
+    private @Value("${console.server.hostname:localhost}") String hostname;
 
     Mono<Availability> checkAvailability(String console) {
         return this.webClient
