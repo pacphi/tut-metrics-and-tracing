@@ -11,6 +11,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -58,12 +59,13 @@ class Availability {
 class AvailabilityClient {
 
     private final WebClient webClient;
-    private static final String URI = "http://localhost:8083/availability/{console}";
+    private @Value("${console_server_port:8083}") Integer port;
+    private @Value("${console_server_hostname:localhost}") String hostname;
 
     Mono<Availability> checkAvailability(String console) {
         return this.webClient
                 .get()
-                .uri(URI, console)
+                .uri(String.format("http://%s:%d/availability/{console}", hostname, port))
                 .retrieve()
                 .bodyToMono(Availability.class)
                 .onErrorReturn(new Availability(false, console));
