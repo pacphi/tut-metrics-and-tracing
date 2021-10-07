@@ -1,0 +1,9 @@
+target/
+bin/
+release.properties
+.history/
+.classpath
+.project
+.factorypath
+.settings/
+logs/
