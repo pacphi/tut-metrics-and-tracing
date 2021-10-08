@@ -67,7 +67,7 @@ class AvailabilityClient {
         return webClientBuilder
                 .build()
                     .get()
-                    .uri(String.format("http://%s:%d/availability/{console}", hostname, port))
+                    .uri(String.format("http://%s:%d/availability/{console}", hostname, port), console)
                     .retrieve()
                     .bodyToMono(Availability.class)
                     .onErrorReturn(new Availability(false, console));
