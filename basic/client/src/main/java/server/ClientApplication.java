@@ -61,17 +61,18 @@ class Availability {
 @RequiredArgsConstructor
 class AvailabilityClient {
 
-    private final WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
     private @Value("${console.server.port:8083}") Integer port;
     private @Value("${console.server.hostname:localhost}") String hostname;
 
     Mono<Availability> checkAvailability(String console) {
-        return webClient
-                .get()
-                .uri(String.format("http://%s:%d/availability/{console}", hostname, port))
-                .retrieve()
-                .bodyToMono(Availability.class)
-                .onErrorReturn(new Availability(false, console));
+        return webClientBuilder
+                .build()
+                    .get()
+                    .uri(String.format("http://%s:%d/availability/{console}", hostname, port))
+                    .retrieve()
+                    .bodyToMono(Availability.class)
+                    .onErrorReturn(new Availability(false, console));
     }
 
 }
