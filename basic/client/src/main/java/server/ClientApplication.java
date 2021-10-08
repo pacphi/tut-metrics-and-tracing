@@ -1,6 +1,8 @@
 package client;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -8,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -23,6 +26,7 @@ import reactor.core.publisher.Mono;
 @SpringBootApplication
 public class ClientApplication {
 
+    private static final List<String> CONSOLES = List.of("ps4", "ps5", "xbox", "switch");
     public static void main(String[] args) {
         log.info("starting client");
         SpringApplication.run(ClientApplication.class, args);
@@ -36,14 +40,23 @@ public class ClientApplication {
     @Bean
     ApplicationListener<ApplicationReadyEvent> ready(AvailabilityClient client) {
         return applicationReadyEvent -> {
-            for (var console : "ps5,xbox,ps4,switch".split(",")) {
-                Flux.range(0, 20).delayElements(Duration.ofMillis(100)).subscribe(i ->
-                        client
-                                .checkAvailability(console)
-                                .subscribe(availability ->
-                                        log.info("console: {}, availability: {} ", console, availability.isAvailable())));
-            }
+            checkConsoleAvailability(client);
         };
+    }
+
+    @Scheduled(fixedRate = 10000)
+    protected void checkConsoleAvailability(AvailabilityClient client) {
+        for (var console : CONSOLES) {
+            Flux
+                .range(0, 20)
+                .delayElements(Duration.ofMillis(100))
+                .subscribe(i -> client
+                                    .checkAvailability(console)
+                                    .subscribe(availability ->
+                                        log.info("console: {}, availability: {} ", console, availability.isAvailable())
+                                    )
+                );
+        }
     }
 }
 
