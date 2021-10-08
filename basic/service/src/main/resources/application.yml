@@ -1,15 +1,15 @@
 spring:
   application:
     name: console-availability-service
-  cloud:
-    kubernetes:
-      reload:
-        enabled: true
-        mode: polling
-        period: 5000
-      config:
-        sources:
-          - name: ${spring.application.name}
+  # cloud:
+  #   kubernetes:
+  #     reload:
+  #       enabled: true
+  #       mode: polling
+  #       period: 5000
+  #     config:
+  #       sources:
+  #         - name: ${spring.application.name}
 
 management:
   endpoints:
