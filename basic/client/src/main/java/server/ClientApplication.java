@@ -26,7 +26,6 @@ import reactor.core.publisher.Mono;
 @SpringBootApplication
 public class ClientApplication {
 
-    private static final List<String> CONSOLES = List.of("ps4", "ps5", "xbox", "switch");
     public static void main(String[] args) {
         log.info("starting client");
         SpringApplication.run(ClientApplication.class, args);
@@ -38,14 +37,25 @@ public class ClientApplication {
     }
 
     @Bean
-    ApplicationListener<ApplicationReadyEvent> ready(AvailabilityClient client) {
+    ApplicationListener<ApplicationReadyEvent> ready(Poller poller) {
         return applicationReadyEvent -> {
-            checkConsoleAvailability(client);
+            poller.checkConsoleAvailability();
         };
     }
 
+}
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+class Poller {
+
+    private static final List<String> CONSOLES = List.of("ps4", "ps5", "xbox", "switch");
+
+    private final AvailabilityClient client;
+
     @Scheduled(fixedRate = 10000)
-    protected void checkConsoleAvailability(AvailabilityClient client) {
+    void checkConsoleAvailability() {
         for (var console : CONSOLES) {
             Flux
                 .range(0, 20)
